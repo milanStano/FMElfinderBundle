@@ -5,7 +5,7 @@ namespace FM\ElfinderBundle\Controller;
 use Exception;
 use FM\ElfinderBundle\Loader\ElFinderLoader;
 use FM\ElfinderBundle\Session\ElFinderSession;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +17,7 @@ use FM\ElfinderBundle\Event\ElFinderPostExecutionEvent;
 /**
  * Class ElFinderController.
  */
-class ElFinderController extends Controller
+class ElFinderController extends AbstractController
 {
     /**
      * Renders Elfinder.

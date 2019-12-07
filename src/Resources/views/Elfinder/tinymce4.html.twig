@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-{% if includeAssets %}
-    {{ include("@FMElfinder/Elfinder/helper/assets_css.html.twig") }}
-{% endif %}
+    <script data-main="{{ asset("#{prefix}/elfinder/main.default.js")}}" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
 </head>
 <body>
-{% if includeAssets %}
-    {{ include("@FMElfinder/Elfinder/helper/assets_js.html.twig") }}
-{% endif %}
 <script type="text/javascript" charset="utf-8">
     var FileBrowserDialogue = {
         init: function () {
@@ -40,6 +35,6 @@
         }).elfinder('instance');
     });
 </script>
-<div class="elfinder"></div>
+<div id="elfinder"></div>
 </body>
 </html>

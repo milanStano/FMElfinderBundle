@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    {% if includeAssets %}
-        {{ include("@FMElfinder/Elfinder/helper/assets_css.html.twig") }}
-    {% endif %}
+    <script data-main="{{ asset("#{prefix}/elfinder/main.default.js")}}" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
 </head>
 <body>
-{% if includeAssets %}
-    {{ include("@FMElfinder/Elfinder/helper/assets_js.html.twig") }}
-{% endif %}
 <script type="text/javascript" charset="utf-8">
     function getUrlParam(paramName) {
         var reParam = new RegExp('(?:[\?&]|&amp;)' + paramName + '=([^&]+)', 'i') ;
@@ -17,38 +11,57 @@
 
         return (match && match.length > 1) ? match[1] : '' ;
     }
-    $().ready(function() {
-        var funcNum = getUrlParam('CKEditorFuncNum');
-        var mode = getUrlParam('mode');
-
-        var f = $('.elfinder').elfinder({
-            url : '{{path('ef_connect', {'instance': instance, 'homeFolder': homeFolder })}}'+'?mode='+mode,
-            lang : '{{locale}}',
-            onlyMimes: {{ onlyMimes|raw }},
-            getFileCallback : function(file) {
-                if (funcNum) {
-                    {% if relative_path %}
-                        window.opener.CKEDITOR.tools.callFunction(funcNum, '{{ pathPrefix }}'+file.url.replace("{{ app.request.schemeAndHttpHost }}/", ""));
-                    {% else %}
-                        window.opener.CKEDITOR.tools.callFunction(funcNum, file.url);
-                    {% endif %}
-                    window.close();
+    var funcNum = getUrlParam('CKEditorFuncNum');
+    var mode = getUrlParam('mode');
+    define('elFinderConfig', {                
+            defaultOpts : {
+                url : '{{path('ef_connect', {'instance': instance, 'homeFolder': homeFolder })}}'+'?mode='+mode,
+                lang : '{{locale}}',
+                onlyMimes: {{ onlyMimes|raw }},
+                getFileCallback : function(file) {
+                    if (funcNum) {
+                        {% if relative_path %}
+                            window.opener.CKEDITOR.tools.callFunction(funcNum, '{{ pathPrefix }}'+file.url.replace("{{ app.request.schemeAndHttpHost }}/", ""));
+                        {% else %}
+                            window.opener.CKEDITOR.tools.callFunction(funcNum, file.url);
+                        {% endif %}
+                        window.close();
+                        }
+                    },
+                bootCallback : function(fm, extraObj) {
+                    /* any bind functions etc. */
+                    fm.bind('init', function() {
+                        // any your code
+                    });
+                    // for example set document.title dynamically.
+                    var title = document.title;
+                    fm.bind('open', function() {
+                        var path = '',
+                            cwd  = fm.cwd();
+                        if (cwd) {
+                            path = fm.path(cwd.hash) || null;
+                        }
+                        document.title = path? path + ':' + title : title;
+                    }).bind('destroy', function() {
+                        document.title = title;
+                    });
                 }
+            },
+            managers : {
+                // 'DOM Element ID': { /* elFinder options of this DOM Element */ }
+                'elfinder': {}
             }
         });
-
         {% if fullscreen %}
-        $(window).resize(function(){
-            var h = $(window).height();
-            var $ef = $('.elfinder');
-            if($ef.height() != h - 20){
-                $ef.height(h -20).resize();
+        window.addEventListener('resize', function(event) {
+            var h = window.screen.height;
+            var ef = document.getElementById('elfinder');
+            if(ef.clientHeight != h - 20){
+                ef.style.height(h - 20);
             }
-        });
-        $(window).resize();
+        }, true);        
         {% endif %}
-    });
 </script>
-<div class="elfinder"></div>
+<div id="elfinder"></div>
 </body>
 </html>
